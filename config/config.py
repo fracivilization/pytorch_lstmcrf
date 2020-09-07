@@ -5,13 +5,14 @@
 import numpy as np
 from tqdm import tqdm
 from typing import List, Tuple, Dict, Union
-from common import Instance
+from common import Instance, Span
 import torch
 from enum import Enum
 import os
 
 from termcolor import colored
 
+import random
 
 START = "<START>"
 STOP = "<STOP>"
@@ -259,3 +260,37 @@ class Config:
             if inst.output:
                 for label in inst.output:
                     inst.output_ids.append(self.label2idx[label])
+
+def remove_entites(train_insts: List[Instance], config: Config) -> Set:
+    """
+    Remove certain number of entities and make them become O label
+    :param train_insts:
+    :param config:
+    :return:
+    """
+    all_spans = []
+    for inst in train_insts:
+        output = inst.output
+        start = -1
+        for i in range(len(output)):
+            if output[i].startswith("B-"):
+                start = i
+            if output[i].startswith("E-"):
+                end = i
+                all_spans.append(Span(start, end, output[i][2:], inst_id=inst.id))
+            if output[i].startswith("S-"):
+                all_spans.append(Span(i, i, output[i][2:], inst_id=inst.id))
+    random.shuffle(all_spans)
+
+    span_set = set()
+    num_entity_removed = round(len(all_spans) * (1 - config.entity_keep_ratio))
+    for i in range(num_entity_removed):
+        span = all_spans[i]
+        id = span.inst_id
+        output = train_insts[id].output
+        for j in range(span.left, span.right + 1):
+            output[j] = config.O
+        span_str = ' '.join(train_insts[id].input.words[span.left:(span.right + 1)])
+        span_str = span.type + " " + span_str
+        span_set.add(span_str)
+    return span_set
