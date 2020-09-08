@@ -323,6 +323,7 @@ def main():
     trains = reader.read_txt(conf.train_file, conf.train_num)
     devs = reader.read_txt(conf.dev_file, conf.dev_num)
     tests = reader.read_txt(conf.test_file, conf.test_num)
+    _ = remove_entites(trains, conf)
 
     if conf.static_context_emb != ContextEmb.none:
         print('Loading the static ELMo vectors for all datasets.')
@@ -352,7 +353,6 @@ def main():
         print(colored(f"[Data Info] Tokenizing the instances using '{conf.embedder_type}' tokenizer", "red"))
         tokenize_instance(context_models[conf.embedder_type]["tokenizer"].from_pretrained(conf.embedder_type), trains + devs + tests, conf.label2idx)
 
-    _ = remove_entites(trains, conf)
     train_model(conf, trains, devs, tests)
 
 
