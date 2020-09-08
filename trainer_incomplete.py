@@ -125,7 +125,10 @@ def train_one(config: Config, train_insts: List[Instance], dev_insts: List[Insta
             optimizer = lr_decay(config, optimizer, i)
         for index in tqdm(np.random.permutation(train_batch_size), desc="--training batch", total=train_batch_size):
             model.train()
-            loss = model(**train_batches[index])
+            try:
+                loss = model(**train_batches[index])
+            except RuntimeError:
+                pass
             epoch_loss += loss.item()
             loss.backward()
             if config.max_grad_norm > 0:
