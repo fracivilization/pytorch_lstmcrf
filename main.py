@@ -112,9 +112,9 @@ def train_model(config: Config, train_insts: List[List[Instance]], dev_insts: Li
             model = NNCRF(config)
             model_name = model_names[fold_id]
             model.load_state_dict(torch.load(model_name))
-            predict_with_constraints(config=config, model=model,
-                                     fold_batches = train_batches[1-fold_id],
-                                     folded_insts= train_insts[1 - fold_id])  ## set a new label id
+            train_insts[1-fold_id] = predict_with_constraints(config=config, model=model,
+                                                            fold_batches = train_batches[1-fold_id],
+                                                            folded_insts= train_insts[1-fold_id])  ## set a new label id
 
         print("\n\n")
 
@@ -163,7 +163,7 @@ def predict_with_constraints(config: Config, model: NNCRF, fold_batches: List[Tu
                 length = word_seq_lens[idx]
                 one_batch_insts[idx].marginals = marginals[idx, :length, :]
         batch_id += 1
-
+    return folded_insts
 
 def train_one(config: Config, train_batches: List[Tuple], dev_insts: List[Instance],
               dev_batches: List[Tuple], model_name: str, test_insts: List[Instance] = None,
@@ -269,19 +269,14 @@ def main():
 
     print("[Data Info] Removing the entities")
     ## it will return the set of removed entities (for debug purpose)
-    _ = remove_entites(trains, conf)
     # print(f"entities removed: {span_set}")
     conf.map_insts_ids(trains)
     random.shuffle(trains)
     for inst in trains:
         inst.is_prediction = [False] * len(inst.input)
-        if conf.variant == "soft":
-            inst.marginals = np.full((len(inst.input), conf.label_size), -1e10)
         for pos, label in enumerate(inst.output):
             if label == conf.O:
                 inst.is_prediction[pos] = True
-            if conf.variant == "soft":
-                inst.marginals[pos, conf.label2idx[label]] = 0
 
     num_insts_in_fold = math.ceil(len(trains) / conf.num_folds)
     trains = [trains[i * num_insts_in_fold: (i + 1) * num_insts_in_fold] for i in range(conf.num_folds)]

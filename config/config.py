@@ -93,6 +93,8 @@ class Config:
         self.max_no_incre = args.max_no_incre
         self.max_grad_norm = args.max_grad_norm
 
+        # incmplete ner
+        self.num_folds = 2
     def read_pretrain_embedding(self) -> Tuple[Union[Dict[str, np.array], None], int]:
         """
         Read the pretrained word embeddings, return the complete embeddings and the embedding dimension
