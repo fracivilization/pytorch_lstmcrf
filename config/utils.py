@@ -81,7 +81,7 @@ def bert_batching(config, insts: List[Instance]) -> Dict[str,torch.Tensor]:
         "input_mask": input_mask.to(config.device),
         "labels": label_seq_tensor.to(config.device)
     }
-    if annotation_mask:
+    if annotation_mask != None:
         ret_dict["annotation_mask"] = annotation_mask.to(config.device)
         return ret_dict
     else:
