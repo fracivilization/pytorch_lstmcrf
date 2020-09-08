@@ -80,7 +80,7 @@ def tokenize_instance(transformer_tokenizer: PreTrainedTokenizer, insts: List[In
             for label in inst.output:
                 inst.output_ids.append(label2idx[label])
 
-        input_ids = transformer_tokenizer.convert_tokens_to_ids([transformer_tokenizer.cls_token] + tokens[:max_seq_length-2] + [transformer_tokenizer.sep_token])
+        input_ids = transformer_tokenizer.convert_tokens_to_ids([transformer_tokenizer.cls_token] + tokens + [transformer_tokenizer.sep_token])
         inst.word_ids = input_ids
         inst.orig_to_tok_index = orig_to_tok_index
 
