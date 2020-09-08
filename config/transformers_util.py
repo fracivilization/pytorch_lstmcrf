@@ -50,7 +50,7 @@ def get_huggingface_optimizer_and_scheduler(config: Config, model: nn.Module,
     )
     return optimizer, scheduler
 
-def tokenize_instance(transformer_tokenizer: PreTrainedTokenizer, insts: List[Instance], label2idx: Dict[str, int], max_seq_length=100000) -> None:
+def tokenize_instance(transformer_tokenizer: PreTrainedTokenizer, insts: List[Instance], label2idx: Dict[str, int]) -> None:
     """
     Tokenize the instances for BERT-based model
     :param tokenizer: Pretrained_Tokenizer from the transformer packages
