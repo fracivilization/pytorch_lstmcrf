@@ -303,3 +303,13 @@ class LinearCRF(nn.Module):
             decodeIdx[:, distance2Last + 1] = torch.gather(lastNIdxRecord, 1, decodeIdx[:, distance2Last].view(batchSize, 1)).view(batchSize)
 
         return bestScores, decodeIdx
+
+    def constrained_decode(self, lstm_scores: torch.Tensor, sent_len: torch.Tensor, annotation_mask: torch.Tensor = None) -> Tuple[torch.Tensor, torch.Tensor]:
+        """
+        :param lstm_scores: (batch_size, sent_len, num_labels)
+        :param sent_len: (batch_size)
+        :param annotation_mask: (batch_size, sent_len, num_labels)
+        """
+        all_scores = self.calculate_all_scores(lstm_scores)
+        bestScores, decodeIdx = self.constrainted_viterbi_decode(all_scores, sent_len, annotation_mask)
+        return bestScores, decodeIdx

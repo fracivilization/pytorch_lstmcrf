@@ -79,5 +79,5 @@ class TransformersCRF(nn.Module):
         """
         word_rep = self.embedder(words, orig_to_tok_index, input_mask)
         features = self.encoder(word_rep, word_seq_lens)
-        bestScores, decodeIdx = self.inferencer.constrainted_viterbi_decode(features, word_seq_lens, annotation_mask)
+        bestScores, decodeIdx = self.inferencer.constrainted_decode(features, word_seq_lens, annotation_mask)
         return bestScores, decodeIdx
