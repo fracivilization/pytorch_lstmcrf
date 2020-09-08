@@ -63,7 +63,7 @@ def parse_arguments(parser):
     parser.add_argument('--static_context_emb', type=str, default="none", choices=["none", "elmo"],
                         help="static contextual word embedding, our old ways to incorporate ELMo and BERT.")
 
-    parser.add_argument('--embedder_type', type=str, default="bert-base-cased",
+    parser.add_argument('--embedder_type', type=str, default="dmis-lab/biobert-v1.1",
                         choices=["normal"] + list(context_models.keys()),
                         help="normal means word embedding + char, otherwise you can use 'bert-base-cased' and so on")
     parser.add_argument('--parallel_embedder', type=int, default=0,
