@@ -81,11 +81,6 @@ def parse_arguments(parser):
 def train_one(config: Config, train_insts: List[Instance], dev_insts: List[Instance], model_name: str, test_insts: List[Instance] = None,
               config_name: str = None, result_filename: str = None):
     train_batches = batching_list_instances(config, train_insts)
-    if test_insts:
-        test_batches = batching_list_instances(config, test_insts)
-    else:
-        test_batches = None
-    dev_batches = batching_list_instances(config, dev_insts)
     epoch = config.num_epochs
     print(
         colored(f"[Model Info]: Working with transformers package from huggingface with {config.embedder_type}", 'red'))
@@ -106,10 +101,10 @@ def train_one(config: Config, train_insts: List[Instance], dev_insts: List[Insta
 
     model_folder = config.model_folder
     res_folder = "results"
-    if os.path.exists("model_files/" + model_folder):
-        raise FileExistsError(
-            f"The folder model_files/{model_folder} exists. Please either delete it or create a new one "
-            f"to avoid override.")
+    # if os.path.exists("model_files/" + model_folder):
+    #     raise FileExistsError(
+    #         f"The folder model_files/{model_folder} exists. Please either delete it or create a new one "
+    #         f"to avoid override.")
     model_path = f"model_files/{model_folder}/lstm_crf.m"
     config_path = f"model_files/{model_folder}/config.conf"
     res_path = f"{res_folder}/{model_folder}.results"
