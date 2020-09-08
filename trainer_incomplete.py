@@ -145,7 +145,8 @@ def train_one(config: Config, train_insts: List[Instance], dev_insts: List[Insta
             no_incre_dev = 0
             best_dev[0] = dev_metrics[2]
             best_dev[1] = i
-            best_test[0] = test_metrics[2]
+            if test_insts:
+                best_test[0] = test_metrics[2]
             best_test[1] = i
             torch.save(model.state_dict(), model_path)
             # Save the corresponding config as well.
@@ -167,7 +168,8 @@ def train_one(config: Config, train_insts: List[Instance], dev_insts: List[Insta
     print("Finished archiving the models")
 
     print("The best dev: %.2f" % (best_dev[0]))
-    print("The corresponding test: %.2f" % (best_test[0]))
+    if test_insts:
+        print("The corresponding test: %.2f" % (best_test[0]))
     print("Final testing.")
     model.load_state_dict(torch.load(model_path))
     model.eval()
