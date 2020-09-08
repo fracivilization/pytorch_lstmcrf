@@ -244,6 +244,7 @@ def evaluate_on_test(config: Config, all_train_insts: List[Instance], dev_insts:
     # print("Final testing.")
     model = TransformersCRF(config)
     model.load_state_dict(torch.load(model_name))
+    model.to(config.device)
     model.eval()
     evaluate_model(config, model, "test", test_insts)
     write_results(res_name, test_insts)
