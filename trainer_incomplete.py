@@ -207,6 +207,7 @@ def predict_with_constraints(config: Config, model: TransformersCRF, fold_batche
                 prediction = batch_max_ids[idx][:length].tolist()
                 prediction = prediction[::-1]
                 one_batch_insts[idx].output_ids = prediction
+    return folded_insts
 
 def update_train_insts(config: Config, train_insts:  List[List[Instance]], model_names):
     # assign hard prediction to other folds
