@@ -82,7 +82,8 @@ def parse_arguments(parser):
 
 def train_one(config: Config, train_insts: List[Instance], dev_insts: List[Instance], model_name: str, test_insts: List[Instance] = None,
               config_name: str = None, result_filename: str = None):
-    train_batch_size = len(train_insts) // config.batch_size + 1
+    train_batches = batching_list_instances(config, train_insts)
+    train_batch_size = len(train_batches)
     epoch = config.num_epochs
     print(
         colored(f"[Model Info]: Working with transformers package from huggingface with {config.embedder_type}", 'red'))
@@ -116,7 +117,6 @@ def train_one(config: Config, train_insts: List[Instance], dev_insts: List[Insta
     no_incre_dev = 0
     print(colored(f"[Train Info] Start training, you have set to stop if performace not increase for {config.max_no_incre} epochs",'red'))
 
-    train_batches = batching_list_instances(config, train_insts)
     for i in tqdm(range(1, epoch + 1), desc="Epoch"):
         epoch_loss = 0
         start_time = time.time()
