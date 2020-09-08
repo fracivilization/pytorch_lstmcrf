@@ -174,7 +174,7 @@ def train_one(config: Config, train_insts: List[Instance], dev_insts: List[Insta
     print("Final testing.")
     model.load_state_dict(torch.load(model_path))
     model.eval()
-    evaluate_model_by_constrained_decode(config, model, "test", test_insts)
+    evaluate_model(config, model, "test", test_insts)
     write_results(res_path, test_insts)
 
 def train_model_on_splitted_train(config: Config, train_insts: List[List[Instance]], dev_insts: List[Instance]):
@@ -281,34 +281,6 @@ def evaluate_model(config: Config, model: TransformersCRF, name: str, insts: Lis
         for batch in batch_insts_ids:
             one_batch_insts = insts[batch_id * batch_size:(batch_id + 1) * batch_size]
             batch_max_scores, batch_max_ids = model.decode(**batch)
-            batch_p , batch_predict, batch_total = evaluate_batch_insts(one_batch_insts, batch_max_ids, batch["labels"], batch["word_seq_lens"], config.idx2labels)
-            p_dict += batch_p
-            total_predict_dict += batch_predict
-            total_entity_dict += batch_total
-            batch_id += 1
-    if print_each_type_metric:
-        for key in total_entity_dict:
-            precision_key, recall_key, fscore_key = get_metric(p_dict[key], total_entity_dict[key], total_predict_dict[key])
-            print(f"[{key}] Prec.: {precision_key:.2f}, Rec.: {recall_key:.2f}, F1: {fscore_key:.2f}")
-
-    total_p = sum(list(p_dict.values()))
-    total_predict = sum(list(total_predict_dict.values()))
-    total_entity = sum(list(total_entity_dict.values()))
-    precision, recall, fscore = get_metric(total_p, total_entity, total_predict)
-    print(colored(f"[{name} set Total] Prec.: {precision:.2f}, Rec.: {recall:.2f}, F1: {fscore:.2f}", 'blue'), flush=True)
-
-
-    return [precision, recall, fscore]
-
-def evaluate_model_by_constrained_decode(config: Config, model: NNCRF, batch_insts_ids, name: str, insts: List[Instance], print_each_type_metric: bool = False):
-    ## evaluation
-    p_dict, total_predict_dict, total_entity_dict = Counter(), Counter(), Counter()
-    batch_id = 0
-    batch_size = config.batch_size
-    with torch.no_grad():
-        for batch in batch_insts_ids:
-            one_batch_insts = insts[batch_id * batch_size:(batch_id + 1) * batch_size]
-            batch_max_scores, batch_max_ids = model.constrained_decode(**batch)
             batch_p , batch_predict, batch_total = evaluate_batch_insts(one_batch_insts, batch_max_ids, batch["labels"], batch["word_seq_lens"], config.idx2labels)
             p_dict += batch_p
             total_predict_dict += batch_predict
