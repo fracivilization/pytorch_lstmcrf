@@ -95,7 +95,7 @@ class Config:
 
         # incmplete ner
         self.num_folds = 2
-        if args.num_outer_iterations:
+        if hasattr(args, 'num_outer_iterations'):
             self.num_outer_iterations = args.num_outer_iterations
             self.entity_keep_ratio = args.entity_keep_ratio
     def read_pretrain_embedding(self) -> Tuple[Union[Dict[str, np.array], None], int]:
