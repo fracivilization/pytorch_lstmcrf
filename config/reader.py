@@ -21,13 +21,16 @@ class Reader:
     def read_txt(self, file: str, number: int = -1) -> List[Instance]:
         print("Reading file: " + file)
         insts = []
+        tokid = 0
+        max_seq_lens = 256
         with open(file, 'r', encoding='utf-8') as f:
             words = []
             ori_words = []
             labels = []
             for line in tqdm(f.readlines()):
                 line = line.rstrip()
-                if line == "":
+                if line == "" or tokid == max_seq_lens:
+                    tokid = 0
                     inst = Instance(Sentence(words, ori_words), labels)
                     inst.set_id(len(insts))
                     insts.append(inst)
@@ -45,6 +48,7 @@ class Reader:
                 words.append(word)
                 self.vocab.add(word)
                 labels.append(label)
+                tokid += 1
         print("number of sentences: {}".format(len(insts)))
         return insts
 
