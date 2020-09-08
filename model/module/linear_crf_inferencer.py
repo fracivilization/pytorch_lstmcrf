@@ -12,6 +12,7 @@ class LinearCRF(nn.Module):
 
         self.label_size = config.label_size
         self.use_char = config.use_char_rnn
+        self.device = config.device
 
         self.label2idx = config.label2idx
         self.labels = config.idx2labels
