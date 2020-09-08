@@ -180,6 +180,8 @@ def train_one(config: Config, train_insts: List[Instance], dev_insts: List[Insta
 
 def train_model_on_splitted_train(config: Config, train_insts: List[List[Instance]], dev_insts: List[Instance]):
     model_folder = config.model_folder
+    if not os.path.exists(model_folder):
+        os.mkdir(model_folder)
     model_names = []  # model names for each fold
     for fold_id, folded_train_insts in enumerate(train_insts):
         print(f"[Training Info] Training fold {fold_id}.")
