@@ -136,6 +136,7 @@ def train_one(config: Config, train_insts: List[Instance], dev_insts: List[Insta
             model.zero_grad()
             if scheduler is not None:
                 scheduler.step()
+            train_batches[index].clear()
         end_time = time.time()
         print("Epoch %d: %.5f, Time is %.2fs" % (i, epoch_loss, end_time - start_time), flush=True)
 
