@@ -195,17 +195,18 @@ def predict_with_constraints(config: Config, model: TransformersCRF, fold_batche
     batch_id = 0
     batch_size = config.batch_size
     model.eval()
-    for batch in fold_batches:
-        one_batch_insts = folded_insts[batch_id * batch_size:(batch_id + 1) * batch_size]
-        word_seq_lens = batch[1].cpu().numpy()
-        with torch.no_grad():
-            batch_max_scores, batch_max_ids = model.decode(batch)
-        batch_max_ids = batch_max_ids.cpu().numpy()
-        for idx in range(len(batch_max_ids)):
-            length = word_seq_lens[idx]
-            prediction = batch_max_ids[idx][:length].tolist()
-            prediction = prediction[::-1]
-            one_batch_insts[idx].output_ids = prediction
+    with torch.no_grad():
+        for batch in fold_batches:
+            one_batch_insts = folded_insts[batch_id * batch_size:(batch_id + 1) * batch_size]
+            batch_max_scores, batch_max_ids = model.constrained_decode(**batch)
+            word_seq_lens = batch['word_seq_lens']
+            batch_id += 1
+            batch_max_ids = batch_max_ids.cpu().numpy()
+            for idx in range(len(batch_max_ids)):
+                length = word_seq_lens[idx]
+                prediction = batch_max_ids[idx][:length].tolist()
+                prediction = prediction[::-1]
+                one_batch_insts[idx].output_ids = prediction
 
 def update_train_insts(config: Config, train_insts:  List[List[Instance]], model_names):
     # assign hard prediction to other folds
