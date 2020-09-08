@@ -207,6 +207,8 @@ class Config:
         self.label2idx[self.STOP_TAG] = len(self.label2idx)
         self.idx2labels.append(self.STOP_TAG)
         self.label_size = len(self.label2idx)
+        self.start_label_id = self.label2idx[self.START_TAG]
+        self.stop_label_id = self.label2idx[self.STOP_TAG]
         print("#labels: {}".format(self.label_size))
         print("label 2idx: {}".format(self.label2idx))
 
