@@ -148,7 +148,7 @@ def train_one(config: Config, train_insts: List[Instance], dev_insts: List[Insta
             if test_insts:
                 best_test[0] = test_metrics[2]
             best_test[1] = i
-            torch.save(model.state_dict(), model_path)
+            torch.save(model.state_dict(), model_name)
             # Save the corresponding config as well.
             f = open(config_path, 'wb')
             pickle.dump(config, f)
@@ -172,7 +172,7 @@ def train_one(config: Config, train_insts: List[Instance], dev_insts: List[Insta
     if test_insts:
         print("The corresponding test: %.2f" % (best_test[0]))
     print("Final testing.")
-    model.load_state_dict(torch.load(model_path))
+    model.load_state_dict(torch.load(model_name))
     if test_insts:
         model.eval()
         evaluate_model(config, model, "test", test_insts)
