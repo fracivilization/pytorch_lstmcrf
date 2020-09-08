@@ -274,7 +274,6 @@ def train_model(config: Config, train_insts: List[Instance], dev_insts: List[Ins
     for iter in range(num_outer_iterations):
         print(f"[Training Info] Running for {iter}th large iterations.")
         model_names = train_model_on_splitted_train(config, train_instss, dev_insts)
-        model_names = [config.model_folder + f"/lstm_crf_{fold_id}.m" for fold_id in range(2)]
         train_instss = update_train_insts(config, train_instss, model_names)
         all_train_insts = list(itertools.chain.from_iterable(train_instss))
         evaluate_on_test(config, all_train_insts, dev_insts, test_insts)
