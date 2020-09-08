@@ -21,6 +21,7 @@ class Instance:
         self.word_ids = None
         self.char_ids = None
         self.output_ids = None
+        self.is_prediction = None
 
     def __len__(self):
         return len(self.input)

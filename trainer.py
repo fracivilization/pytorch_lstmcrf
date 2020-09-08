@@ -82,6 +82,13 @@ def train_model(config: Config, epoch: int, train_insts: List[Instance], dev_ins
     print(colored("[Shuffled] Shuffle the training instance ids", "red"))
     random.shuffle(train_insts)
 
+    # only hard model of (Jie et al. 2019)
+    for inst in train_insts:
+        inst.is_prediction = [False] * len(inst.input)
+        for pos, label in enumerate(inst.output):
+            if label == config.O:
+                inst.is_prediction[pos] = True
+
     batched_data = batching_list_instances(config, train_insts)
     dev_batches = batching_list_instances(config, dev_insts)
     test_batches = batching_list_instances(config, test_insts)
