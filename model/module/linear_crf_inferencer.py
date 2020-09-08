@@ -256,3 +256,49 @@ class LinearCRF(nn.Module):
             decodeIdx[:, distance2Last + 1] = torch.gather(lastNIdxRecord, 1, decodeIdx[:, distance2Last].view(batchSize, 1)).view(batchSize)
 
         return bestScores, decodeIdx
+
+    def constrainted_viterbi_decode(self, all_scores: torch.Tensor, word_seq_lens: torch.Tensor, annotation_mask: torch.Tensor = None) -> Tuple[torch.Tensor, torch.Tensor]:
+        """
+        Use viterbi to decode the instances given the scores and transition parameters
+        :param all_scores: (batch_size x max_seq_len x num_labels)
+        :param word_seq_lens: (batch_size)
+        :return: the best scores as well as the predicted label ids.
+               (batch_size) and (batch_size x max_seq_len)
+        """
+        batchSize = all_scores.shape[0]
+        sentLength = all_scores.shape[1]
+        if annotation_mask is not None:
+            annotation_mask = annotation_mask.float().log()
+        # sent_len =
+        scoresRecord = torch.zeros([batchSize, sentLength, self.label_size]).to(self.device)
+        idxRecord = torch.zeros([batchSize, sentLength, self.label_size], dtype=torch.int64).to(self.device)
+        mask = torch.ones_like(word_seq_lens, dtype=torch.int64).to(self.device)
+        startIds = torch.full((batchSize, self.label_size), self.start_idx, dtype=torch.int64).to(self.device)
+        decodeIdx = torch.LongTensor(batchSize, sentLength).to(self.device)
+
+        scores = all_scores
+        # scoresRecord[:, 0, :] = self.getInitAlphaWithBatchSize(batchSize).view(batchSize, self.label_size)
+        scoresRecord[:, 0, :] = scores[:, 0, self.start_idx, :]  ## represent the best current score from the start, is the best
+        if annotation_mask is not None:
+            scoresRecord[:, 0, :] += annotation_mask[:, 0, :]
+        idxRecord[:,  0, :] = startIds
+        for wordIdx in range(1, sentLength):
+            ### scoresIdx: batch x from_label x to_label at current index.
+            scoresIdx = scoresRecord[:, wordIdx - 1, :].view(batchSize, self.label_size, 1).expand(batchSize, self.label_size,
+                                                                                  self.label_size) + scores[:, wordIdx, :, :]
+            if annotation_mask is not None:
+                scoresIdx += annotation_mask[:, wordIdx, :].view(batchSize, 1, self.label_size).expand(batchSize, self.label_size, self.label_size)
+
+            idxRecord[:, wordIdx, :] = torch.argmax(scoresIdx, 1)  ## the best previous label idx to crrent labels
+            scoresRecord[:, wordIdx, :] = torch.gather(scoresIdx, 1, idxRecord[:, wordIdx, :].view(batchSize, 1, self.label_size)).view(batchSize, self.label_size)
+
+        lastScores = torch.gather(scoresRecord, 1, word_seq_lens.view(batchSize, 1, 1).expand(batchSize, 1, self.label_size) - 1).view(batchSize, self.label_size)  ##select position
+        lastScores += self.transition[:, self.end_idx].view(1, self.label_size).expand(batchSize, self.label_size)
+        decodeIdx[:, 0] = torch.argmax(lastScores, 1)
+        bestScores = torch.gather(lastScores, 1, decodeIdx[:, 0].view(batchSize, 1))
+
+        for distance2Last in range(sentLength - 1):
+            lastNIdxRecord = torch.gather(idxRecord, 1, torch.where(word_seq_lens - distance2Last - 1 > 0, word_seq_lens - distance2Last - 1, mask).view(batchSize, 1, 1).expand(batchSize, 1, self.label_size)).view(batchSize, self.label_size)
+            decodeIdx[:, distance2Last + 1] = torch.gather(lastNIdxRecord, 1, decodeIdx[:, distance2Last].view(batchSize, 1)).view(batchSize)
+
+        return bestScores, decodeIdx

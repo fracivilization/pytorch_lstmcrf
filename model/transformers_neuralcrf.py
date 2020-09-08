@@ -65,3 +65,18 @@ class TransformersCRF(nn.Module):
         features = self.encoder(word_rep, word_seq_lens)
         bestScores, decodeIdx = self.inferencer.decode(features, word_seq_lens)
         return bestScores, decodeIdx
+
+    def constrained_decode(self, words: torch.Tensor,
+                    word_seq_lens: torch.Tensor,
+                    orig_to_tok_index: torch.Tensor,
+                    input_mask,
+                    **kwargs) -> Tuple[torch.Tensor, torch.Tensor]:
+        """
+        Decode the batch input
+        :param batchInput:
+        :return:
+        """
+        word_rep = self.embedder(words, orig_to_tok_index, input_mask)
+        features = self.encoder(word_rep, word_seq_lens)
+        bestScores, decodeIdx = self.inferencer.constrainted_viterbi_decode(features, word_seq_lens)
+        return bestScores, decodeIdx
