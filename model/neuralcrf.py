@@ -26,7 +26,8 @@ class NNCRF(nn.Module):
                     context_emb: torch.Tensor,
                     chars: torch.Tensor,
                     char_seq_lens: torch.Tensor,
-                    labels: torch.Tensor) -> torch.Tensor:
+                    labels: torch.Tensor,
+                    **kwargs) -> torch.Tensor:
         """
         Calculate the negative loglikelihood.
         :param words: (batch_size x max_seq_len)
