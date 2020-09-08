@@ -71,6 +71,7 @@ def parse_arguments(parser):
                         help="use parallel training for those (BERT) models in the transformers. Parallel on GPUs")
 
     parser.add_argument('--num_outer_iterations', type= int , default= 2, help="Number of outer iterations for cross validation")
+    parser.add_argument('--entity_keep_ratio', type= float, default=0.5, help="the percentage of entities to be kept", choices=np.arange(0, 1.1, 0.1))
 
 
 
