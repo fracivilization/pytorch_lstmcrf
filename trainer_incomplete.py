@@ -173,9 +173,10 @@ def train_one(config: Config, train_insts: List[Instance], dev_insts: List[Insta
         print("The corresponding test: %.2f" % (best_test[0]))
     print("Final testing.")
     model.load_state_dict(torch.load(model_path))
-    model.eval()
-    evaluate_model(config, model, "test", test_insts)
-    write_results(res_path, test_insts)
+    if test_insts:
+        model.eval()
+        evaluate_model(config, model, "test", test_insts)
+        write_results(res_path, test_insts)
 
 def train_model_on_splitted_train(config: Config, train_insts: List[List[Instance]], dev_insts: List[Instance]):
     model_folder = config.model_folder
