@@ -40,6 +40,7 @@ def batching_list_instances(config: Config, insts: List[Instance]):
 def bert_batching(config, insts: List[Instance]) -> Dict[str,torch.Tensor]:
     batch_size = len(insts)
     batch_data = insts
+    label_size = config.label_size
 
     word_seq_len = torch.LongTensor(list(map(lambda inst: len(inst.input.words), batch_data)))
     max_seq_len = word_seq_len.max()
@@ -50,6 +51,10 @@ def bert_batching(config, insts: List[Instance]) -> Dict[str,torch.Tensor]:
     word_seq_tensor = torch.zeros([batch_size, max_tok_seq_len], dtype=torch.long)
     orig_to_tok_index = torch.zeros([batch_size, max_seq_len], dtype=torch.long)
     label_seq_tensor = torch.zeros([batch_size, max_seq_len], dtype=torch.long)
+    annotation_mask = None
+    if batch_data[0].is_prediction is not None:
+        annotation_mask = torch.zeros((batch_size, max_seq_len, label_size), dtype = torch.long)
+
     """
     Bert model needs an input mask
     """
@@ -60,13 +65,23 @@ def bert_batching(config, insts: List[Instance]) -> Dict[str,torch.Tensor]:
         input_mask[idx, :token_seq_len[idx]]  = 1
         if batch_data[idx].output_ids:
             label_seq_tensor[idx, :word_seq_len[idx]] = torch.LongTensor(batch_data[idx].output_ids)
+        if batch_data[idx].is_prediction is not None:
+            for pos in range(len(batch_data[idx].input)):
+                if batch_data[idx].is_prediction[pos]:
+                    annotation_mask[idx, pos, :] = 1
+                    annotation_mask[idx, pos, config.start_label_id] = 0
+                    annotation_mask[idx, pos, config.stop_label_id] = 0
+                else:
+                    annotation_mask[idx, pos, batch_data[idx].output_ids[pos]] = 1
+            annotation_mask[idx, word_seq_len[idx]:, :] = 1
 
     return  {
         "words": word_seq_tensor.to(config.device),
         "word_seq_lens": word_seq_len.to(config.device),
         "orig_to_tok_index": orig_to_tok_index.to(config.device),
         "input_mask": input_mask.to(config.device),
-        "labels": label_seq_tensor.to(config.device)
+        "labels": label_seq_tensor.to(config.device),
+        "annotation_mask": annotation_mask.to(config.device)
     }
 
 def simple_batching(config, insts: List[Instance]) -> Dict[str,torch.Tensor]:
