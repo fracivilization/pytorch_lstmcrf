@@ -217,6 +217,7 @@ def update_train_insts(config: Config, train_insts:  List[List[Instance]], model
         model = TransformersCRF(config)
         model_name = model_names[fold_id]
         model.load_state_dict(torch.load(model_name))
+        model.to(config.device)
         predict_with_constraints(config=config, model=model,
                                  fold_batches=train_batches[1 - fold_id],
                                  folded_insts=train_insts[1 - fold_id])  ## set a new label id
