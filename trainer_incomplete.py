@@ -72,6 +72,7 @@ def parse_arguments(parser):
 
     parser.add_argument('--num_outer_iterations', type= int , default= 2, help="Number of outer iterations for cross validation")
     parser.add_argument('--entity_keep_ratio', type= float, default=0.5, help="the percentage of entities to be kept", choices=np.arange(0, 1.1, 0.1))
+    parser.add_argument('--max_seq_lens', type= int , default= 2, help="Max Sequence length")
 
 
 
@@ -352,7 +353,8 @@ def main():
         we need to use the pretrained tokenizer
         """
         print(colored(f"[Data Info] Tokenizing the instances using '{conf.embedder_type}' tokenizer", "red"))
-        tokenize_instance(context_models[conf.embedder_type]["tokenizer"].from_pretrained(conf.embedder_type), trains + devs + tests, conf.label2idx)
+        tokenize_instance(context_models[conf.embedder_type]["tokenizer"].from_pretrained(conf.embedder_type), trains + devs + tests, conf.label2idx,
+                          max_seq_length=256)
 
     train_model(conf, trains, devs, tests)
 
