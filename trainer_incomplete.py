@@ -118,17 +118,15 @@ def train_one(config: Config, train_insts: List[Instance], dev_insts: List[Insta
     print(colored(f"[Train Info] Start training, you have set to stop if performace not increase for {config.max_no_incre} epochs",'red'))
 
     for i in tqdm(range(1, epoch + 1), desc="Epoch"):
+        model.train()
         epoch_loss = 0
         start_time = time.time()
         model.zero_grad()
         if config.optimizer.lower() == "sgd":
             optimizer = lr_decay(config, optimizer, i)
         for index in tqdm(np.random.permutation(train_batch_size), desc="--training batch", total=train_batch_size):
-            model.train()
-            try:
-                loss = model(**train_batches[index])
-            except RuntimeError:
-                pass
+            torch.cuda.empty_cache()
+            loss = model(**train_batches[index])
             epoch_loss += loss.item()
             loss.backward()
             if config.max_grad_norm > 0:
