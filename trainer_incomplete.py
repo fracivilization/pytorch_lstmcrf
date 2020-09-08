@@ -69,6 +69,9 @@ def parse_arguments(parser):
                         choices=[0, 1],
                         help="use parallel training for those (BERT) models in the transformers. Parallel on GPUs")
 
+    parser.add_argument('--num_outer_iterations', type= int , default= 2, help="Number of outer iterations for cross validation")
+
+
 
     args = parser.parse_args()
     for k in args.__dict__:
