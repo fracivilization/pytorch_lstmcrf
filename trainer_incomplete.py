@@ -81,7 +81,10 @@ def parse_arguments(parser):
 def train_one(config: Config, train_insts: List[Instance], dev_insts: List[Instance], model_name: str, test_insts: List[Instance] = None,
               config_name: str = None, result_filename: str = None):
     train_batches = batching_list_instances(config, train_insts)
-    test_batches = batching_list_instances(config, test_insts)
+    if test_insts
+        test_batches = batching_list_instances(config, test_insts)
+    else:
+        test_batches = None
     dev_batches = batching_list_instances(config, dev_insts)
     epoch = config.num_epochs
     print(
