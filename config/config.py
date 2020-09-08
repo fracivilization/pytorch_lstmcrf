@@ -97,6 +97,7 @@ class Config:
         self.num_folds = 2
         if args.num_outer_iterations:
             self.num_outer_iterations = args.num_outer_iterations
+            self.entity_keep_ratio = args.entity_keep_ratio
     def read_pretrain_embedding(self) -> Tuple[Union[Dict[str, np.array], None], int]:
         """
         Read the pretrained word embeddings, return the complete embeddings and the embedding dimension
