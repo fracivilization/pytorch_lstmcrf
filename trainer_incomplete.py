@@ -138,7 +138,8 @@ def train_one(config: Config, train_insts: List[Instance], dev_insts: List[Insta
 
         model.eval()
         dev_metrics = evaluate_model(config, model, "dev", dev_insts)
-        test_metrics = evaluate_model(config, model, "test", test_insts)
+        if test_insts:
+            test_metrics = evaluate_model(config, model, "test", test_insts)
         if dev_metrics[2] > best_dev[0]:
             print("saving the best model...")
             no_incre_dev = 0
@@ -267,7 +268,7 @@ def train_model(config: Config, train_insts: List[Instance], dev_insts: List[Ins
 
 
 
-def evaluate_model(config: Config, model: NNCRF, name: str, insts: List[Instance], print_each_type_metric: bool = False):
+def evaluate_model(config: Config, model: TransformersCRF, name: str, insts: List[Instance], print_each_type_metric: bool = False):
     ## evaluation
     batch_insts_ids = batching_list_instances(config, insts)
     p_dict, total_predict_dict, total_entity_dict = Counter(), Counter(), Counter()
