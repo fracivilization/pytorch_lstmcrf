@@ -323,7 +323,6 @@ def main():
     trains = reader.read_txt(conf.train_file, conf.train_num)
     devs = reader.read_txt(conf.dev_file, conf.dev_num)
     tests = reader.read_txt(conf.test_file, conf.test_num)
-    _ = remove_entites(trains, conf)
 
     if conf.static_context_emb != ContextEmb.none:
         print('Loading the static ELMo vectors for all datasets.')
@@ -333,6 +332,7 @@ def main():
 
     conf.use_iobes(trains + devs + tests)
     conf.build_label_idx(trains + devs + tests)
+    _ = remove_entites(trains, conf)
 
     if conf.embedder_type == "normal":
         conf.build_word_idx(trains, devs, tests)
