@@ -23,6 +23,8 @@ class Instance:
         self.char_ids = None
         self.output_ids = None
         self.is_prediction = None
+    def set_id(self, id: int):
+        self.id = id
 
     def __len__(self):
         return len(self.input)

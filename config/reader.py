@@ -28,7 +28,9 @@ class Reader:
             for line in tqdm(f.readlines()):
                 line = line.rstrip()
                 if line == "":
-                    insts.append(Instance(Sentence(words, ori_words), labels))
+                    inst = Instance(Sentence(words), labels)
+                    inst.set_id(len(insts))
+                    insts.append(inst)
                     words = []
                     ori_words = []
                     labels = []
