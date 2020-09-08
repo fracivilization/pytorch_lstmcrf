@@ -80,14 +80,14 @@ def parse_arguments(parser):
 
 def train_one(config: Config, train_insts: List[Instance], dev_insts: List[Instance], model_name: str, test_insts: List[Instance] = None,
               config_name: str = None, result_filename: str = None):
-    train_batches = batching_list_instances(config, train_insts)
+    train_batch_size = len(train_insts) // config.batch_size + 1
     epoch = config.num_epochs
     print(
         colored(f"[Model Info]: Working with transformers package from huggingface with {config.embedder_type}", 'red'))
     print(colored(f"[Optimizer Info]: You should be aware that you are using the optimizer from huggingface.", 'red'))
     print(colored(f"[Optimizer Info]: Change the optimier in transformers_util.py if you want to make some modifications.", 'red'))
     model = TransformersCRF(config)
-    optimizer, scheduler = get_huggingface_optimizer_and_scheduler(config, model, num_training_steps=len(train_batches) * epoch,
+    optimizer, scheduler = get_huggingface_optimizer_and_scheduler(config, model, num_training_steps=train_batch_size * epoch,
                                                                    weight_decay=0.0,
                                                                    eps = 1e-8,
                                                                    warmup_step=0)
@@ -113,13 +113,15 @@ def train_one(config: Config, train_insts: List[Instance], dev_insts: List[Insta
     os.makedirs(res_folder, exist_ok=True)
     no_incre_dev = 0
     print(colored(f"[Train Info] Start training, you have set to stop if performace not increase for {config.max_no_incre} epochs",'red'))
+
+    train_batches = batching_list_instances(config, train_insts)
     for i in tqdm(range(1, epoch + 1), desc="Epoch"):
         epoch_loss = 0
         start_time = time.time()
         model.zero_grad()
         if config.optimizer.lower() == "sgd":
             optimizer = lr_decay(config, optimizer, i)
-        for index in tqdm(np.random.permutation(len(train_batches)), desc="--training batch", total=len(train_batches)):
+        for index in tqdm(np.random.permutation(train_batch_size), desc="--training batch", total=train_batch_size):
             model.train()
             loss = model(**train_batches[index])
             epoch_loss += loss.item()
