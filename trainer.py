@@ -83,7 +83,7 @@ def train_model(config: Config, epoch: int, train_insts: List[Instance], dev_ins
     random.shuffle(train_insts)
 
     # only hard model of (Jie et al. 2019)
-    for inst in train_insts:
+    for inst in dev_insts:
         inst.is_prediction = [False] * len(inst.input)
         for pos, label in enumerate(inst.output):
             if label == config.O:
