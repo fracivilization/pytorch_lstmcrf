@@ -153,7 +153,8 @@ def train_one(config: Config, train_insts: List[Instance], dev_insts: List[Insta
             f = open(config_path, 'wb')
             pickle.dump(config, f)
             f.close()
-            write_results(res_path, test_insts)
+            if test_insts:
+                write_results(res_path, test_insts)
         else:
             no_incre_dev += 1
         model.zero_grad()
