@@ -70,6 +70,7 @@ class TransformersCRF(nn.Module):
                     word_seq_lens: torch.Tensor,
                     orig_to_tok_index: torch.Tensor,
                     input_mask,
+                    annotation_mask: torch.Tensor = None,
                     **kwargs) -> Tuple[torch.Tensor, torch.Tensor]:
         """
         Decode the batch input
@@ -78,5 +79,5 @@ class TransformersCRF(nn.Module):
         """
         word_rep = self.embedder(words, orig_to_tok_index, input_mask)
         features = self.encoder(word_rep, word_seq_lens)
-        bestScores, decodeIdx = self.inferencer.constrainted_viterbi_decode(features, word_seq_lens)
+        bestScores, decodeIdx = self.inferencer.constrainted_viterbi_decode(features, word_seq_lens, annotation_mask)
         return bestScores, decodeIdx
