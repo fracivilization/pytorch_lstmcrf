@@ -74,15 +74,18 @@ def bert_batching(config, insts: List[Instance]) -> Dict[str,torch.Tensor]:
                 else:
                     annotation_mask[idx, pos, batch_data[idx].output_ids[pos]] = 1
             annotation_mask[idx, word_seq_len[idx]:, :] = 1
-
-    return  {
+    ret_dict = {
         "words": word_seq_tensor.to(config.device),
         "word_seq_lens": word_seq_len.to(config.device),
         "orig_to_tok_index": orig_to_tok_index.to(config.device),
         "input_mask": input_mask.to(config.device),
-        "labels": label_seq_tensor.to(config.device),
-        "annotation_mask": annotation_mask.to(config.device)
+        "labels": label_seq_tensor.to(config.device)
     }
+    if annotation_mask:
+        ret_dict["annotation_mask"] = annotation_mask.to(config.device)
+        return ret_dict
+    else:
+        return ret_dict
 
 def simple_batching(config, insts: List[Instance]) -> Dict[str,torch.Tensor]:
 
