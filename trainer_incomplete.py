@@ -255,6 +255,7 @@ def evaluate_on_test(config: Config, all_train_insts: List[Instance], dev_insts:
 
 def train_model(config: Config, train_insts: List[Instance], dev_insts: List[Instance], test_insts: List[Instance]):
     ### Data Processing Info
+    # Refine for using Trainer of Hagging Face's
     epoch = config.num_epochs
     train_num = len(train_insts)
     print("number of instances: %d" % (train_num))
