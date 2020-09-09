@@ -47,7 +47,7 @@ def parse_arguments(parser):
     parser.add_argument('--momentum', type=float, default=0.0)
     parser.add_argument('--l2', type=float, default=1e-8)
     parser.add_argument('--lr_decay', type=float, default=0)
-    parser.add_argument('--batch_size', type=int, default=16, help="default batch size is 10 (works well for normal neural crf), here default 30 for bert-based crf")
+    parser.add_argument('--batch_size', type=int, default=8, help="default batch size is 10 (works well for normal neural crf), here default 30 for bert-based crf")
     parser.add_argument('--num_epochs', type=int, default=100, help="Usually we set to 10.")
     parser.add_argument('--train_num', type=int, default=-1, help="-1 means all the data")
     parser.add_argument('--dev_num', type=int, default=-1, help="-1 means all the data")
